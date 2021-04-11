@@ -1,0 +1,46 @@
+version: "3.8"
+
+services:
+    # app-command:
+    #     build:
+    #         context: ./
+    #         dockerfile: Dockerfile
+    #     image: serbanblebea/coffee-shop-cqrs-command:0.1
+    #     depends_on:
+    #         - db-write
+    #         - db-read
+    #     restart: always
+    #     container_name: app-command
+    #     command: ["./coffee-shop", "start"]
+    #     env_file:
+    #         - ./.env
+    #     ports:
+    #         - 8087:${HTTP_PORT}
+    
+    # app-query:
+    #     build:
+    #         context: ./
+    #         dockerfile: Dockerfile
+    #     image: serbanblebea/coffee-shop-cqrs-query:0.1
+    #     depends_on:
+    #         - db-write
+    #         - db-read
+    #     restart: always
+    #     container_name: app-query
+    #     command: ["./coffee-shop", "start"]
+    #     env_file:
+    #         - ./.env
+    #     ports:
+    #         - 8088:${HTTP_PORT}
+
+    db:
+        image: mariadb:latest
+        container_name: db
+        volumes:
+            - ./volume/mysql:/var/lib/mysql
+            - ./mysql-init:/docker-entrypoint-initdb.d
+        restart: always
+        env_file:
+            - ./.env
+        ports:
+            - 3306:3306

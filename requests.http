@@ -1,0 +1,38 @@
+@base_url=http://localhost:8080/api/v1
+
+###
+
+POST {{base_url}}/room/user HTTP/1.1
+content-type: application/json
+
+{
+    "username": "Mihai4",
+    "room_id": "3d057c0b-e07a-420f-9ff8-1a01c5b1cdc5"
+}
+
+###
+
+POST {{base_url}}/room HTTP/1.1
+content-type: application/json
+
+###
+
+@room_id=3d057c0b-e07a-420f-9ff8-1a01c5b1cdc5
+GET {{base_url}}/room/users?room_id={{ room_id }} HTTP/1.1
+content-type: application/json
+
+###
+
+GET {{base_url}}/votes HTTP/1.1
+content-type: application/json
+
+###
+
+POST {{base_url}}/vote HTTP/1.1
+content-type: application/json
+
+{
+    "user_id": "6535694a-dc67-4295-bed6-32b82aec0b62",
+    "room_id": "3d057c0b-e07a-420f-9ff8-1a01c5b1cdc5",
+    "vote": 3
+}
