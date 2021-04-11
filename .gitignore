@@ -2,3 +2,4 @@ scrum-poker
 .env
 volume
 vendor
+.vscode
