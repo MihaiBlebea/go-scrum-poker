@@ -19,7 +19,7 @@ type Handler interface {
 	JoinRoomEndpoint() http.Handler
 	CreateRoomEndpoint() http.Handler
 	VoteOptionsEndpoint() http.Handler
-	RoomUsersEndpoint() http.Handler
+	RoomStateEndpoint() http.Handler
 	VoteEndpoint() http.Handler
 	NextTurnEndpoint() http.Handler
 }

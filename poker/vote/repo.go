@@ -21,9 +21,9 @@ func (r *Repo) GetByID(ID string) (*Vote, error) {
 	return &vote, err
 }
 
-func (r *Repo) GetByUserIDAndTurn(ID string, turn uint) (*Vote, error) {
-	vote := Vote{}
-	err := r.db.Where("user_id = ? AND turn = ?", ID, turn).Order("created_at desc").Last(&vote).Error
+func (r *Repo) GetLatestByTurnAndRoomID(turn uint, roomID string) ([]Vote, error) {
+	votes := make([]Vote, 0)
+	err := r.db.Where("room_id = ? AND turn = ?", roomID, turn).Group("user_id").Find(&votes).Error
 
-	return &vote, err
+	return votes, err
 }

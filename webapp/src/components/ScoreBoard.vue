@@ -5,8 +5,8 @@
             <div class="col-md-3" v-for="(user, index) in users" :key="index">
                 <div class="card mb-3">
                     <div class="card-body px-2 py-0 d-flex justify-content-start align-items-center">
-                        <Vote :vote="user.vote.vote" />
-                        <strong class="ms-3">{{ user.user.username }}</strong>
+                        <Vote :vote="user.vote" />
+                        <strong class="ms-3">{{ user.username }}</strong>
                     </div>
                 </div>
             </div>
@@ -37,4 +37,3 @@ img {
 }
 
 </style>
-

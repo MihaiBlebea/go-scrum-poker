@@ -2,6 +2,7 @@ package poker
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/MihaiBlebea/go-scrum-poker/poker/room"
 	"github.com/MihaiBlebea/go-scrum-poker/poker/user"
@@ -15,7 +16,7 @@ type Poker interface {
 	Vote(roomID, userID string, points uint) error
 	NextTurn(roomID string) (uint, error)
 	GetVoteOptions() []uint
-	TurnVotes(roomID string) ([]UserVote, error)
+	GetState(roomID string) (*State, error)
 }
 
 type poker struct {
@@ -106,36 +107,35 @@ func (p *poker) GetVoteOptions() []uint {
 	return p.voteOptions
 }
 
-type UserVote struct {
-	User user.User `json:"user"`
-	Vote vote.Vote `json:"vote"`
-}
-
-func (p *poker) TurnVotes(roomID string) ([]UserVote, error) {
-	userVotes := make([]UserVote, 0)
-
-	repo := user.NewRepo(p.conn)
+func (p *poker) GetState(roomID string) (*State, error) {
+	userRepo := user.NewRepo(p.conn)
 	voteRepo := vote.NewRepo(p.conn)
 	roomRepo := room.NewRepo(p.conn)
 
-	users, err := repo.GetByRoomID(roomID)
+	room, err := roomRepo.GetByID(roomID)
 	if err != nil {
-		return []UserVote{}, err
+		return &State{}, err
 	}
 
-	rm, err := roomRepo.GetByID(roomID)
+	users, err := userRepo.GetByRoomID(roomID)
 	if err != nil {
-		return []UserVote{}, err
+		return &State{}, err
 	}
 
-	for _, usr := range users {
-		vt, err := voteRepo.GetByUserIDAndTurn(usr.ID, rm.Turn)
-		if err != nil {
-			return []UserVote{}, err
+	votes, err := voteRepo.GetLatestByTurnAndRoomID(room.Turn, room.ID)
+	if err != nil {
+		return &State{}, err
+	}
+	fmt.Println(room.ID, room.Turn)
+	state := newState(room.ID, room.Turn)
+	fmt.Println(votes)
+	for _, vote := range votes {
+		for _, user := range users {
+			if user.ID == vote.UserID {
+				state.addUserState(user.Username, vote.Vote)
+			}
 		}
-
-		userVotes = append(userVotes, UserVote{usr, *vt})
 	}
 
-	return userVotes, nil
+	return state, nil
 }

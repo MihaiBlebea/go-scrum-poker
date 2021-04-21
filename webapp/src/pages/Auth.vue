@@ -33,12 +33,13 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { api } from './../axios'
 import { mapActions } from 'vuex'
 
 export default {
     data() {
         return {
+            firebaseUi: null,
             mode: true,
             roomName: '',
             roomId: '',
@@ -56,7 +57,7 @@ export default {
         ]),
         // Returns room id or throws error
         createRoom: async function() {
-            let result = await axios.post('http://localhost:8080/api/v1/room', {
+            let result = await api.post('/room', {
                 room_name: this.roomName
             })
 
@@ -68,7 +69,7 @@ export default {
         },
         // Returns user id or throws error
         joinRoom: async function() {
-            let result = await axios.post('http://localhost:8080/api/v1/room/user', {
+            let result = await api.post('/room/user', {
                 room_id: this.roomId,
                 username: this.username
             })
@@ -97,7 +98,7 @@ export default {
         }
     },
     mounted: function() {
-
+        
     }
 }
 </script>

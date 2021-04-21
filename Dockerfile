@@ -15,7 +15,7 @@ COPY . .
 # Unit tests
 RUN CGO_ENABLED=0 go test -v
 
-RUN go build -o ./out/coffee-shop .
+RUN go build -o ./out/scrum-poker .
 
 # Start fresh from a smaller image for the runtime container
 FROM debian:buster
@@ -29,8 +29,8 @@ WORKDIR /app
 
 USER nobody
 
-COPY --from=build_base --chown=nobody /tmp/app/out/coffee-shop /app/coffee-shop
+COPY --from=build_base --chown=nobody /tmp/app/out/scrum-poker /app/scrum-poker
 
 EXPOSE ${HTTP_PORT}
 
-CMD ["./coffee-shop", "start"]
+CMD ["./scrum-poker", "start"]

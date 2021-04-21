@@ -4,6 +4,8 @@ import 'bootstrap/dist/css/bootstrap.css'
 
 import Auth from '@/pages/Auth'
 import Room from '@/pages/Room'
+import Register from '@/pages/Register'
+import Login from '@/pages/Login'
 
 Vue.use(Router)
 
@@ -13,6 +15,16 @@ export default new Router({
             path: '/',
             name: 'Auth',
             component: Auth
+        },
+        {
+            path: '/register',
+            name: 'Register',
+            component: Register
+        },
+        {
+            path: '/login',
+            name: 'Login',
+            component: Login
         },
         {
             path: '/room/:id',

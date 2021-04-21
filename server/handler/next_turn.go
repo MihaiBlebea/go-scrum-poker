@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+
+	"github.com/MihaiBlebea/go-scrum-poker/server"
 )
 
 type NextTurnRequest struct {
@@ -47,6 +49,11 @@ func nextTurnEndpoint(poker Poker, logger Logger) http.Handler {
 			response.Message = err.Error()
 			sendResponse(w, response, http.StatusBadRequest, logger)
 			return
+		}
+
+		server.Broadcast <- server.Message{
+			RoomID:  request.RoomID,
+			Message: "HEY",
 		}
 
 		response.Turn = turn

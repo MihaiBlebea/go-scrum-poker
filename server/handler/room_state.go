@@ -12,12 +12,12 @@ type RoomUsersRequest struct {
 }
 
 type RoomUsersResponse struct {
-	Users   []poker.UserVote `json:"users"`
-	Success bool             `json:"success"`
-	Message string           `json:"message,omitempty"`
+	State   poker.State `json:"state"`
+	Success bool        `json:"success"`
+	Message string      `json:"message,omitempty"`
 }
 
-func roomUsersEndpoint(poker Poker, logger Logger) http.Handler {
+func roomStateEndpoint(poker Poker, logger Logger) http.Handler {
 	validate := func(r *http.Request) (*RoomUsersRequest, error) {
 		request := RoomUsersRequest{}
 
@@ -42,14 +42,14 @@ func roomUsersEndpoint(poker Poker, logger Logger) http.Handler {
 			return
 		}
 
-		users, err := poker.TurnVotes(request.RoomID)
+		state, err := poker.GetState(request.RoomID)
 		if err != nil {
 			response.Message = err.Error()
 			sendResponse(w, response, http.StatusBadRequest, logger)
 			return
 		}
 
-		response.Users = users
+		response.State = *state
 		response.Success = true
 
 		sendResponse(w, response, 200, logger)

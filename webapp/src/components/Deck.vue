@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { api } from './../axios'
 import Card from './Card'
 
 export default {
@@ -75,7 +75,7 @@ export default {
         },
         obtainVotes: async function() {
             try {
-                let result = await axios.get('http://localhost:8080/api/v1/votes')
+                let result = await api.get('/votes')
 
                 return result.data.votes
             } catch(err) {

@@ -29,7 +29,7 @@ func server(handler Handler, logger Logger) {
 	api.Handle("/room/user", handler.JoinRoomEndpoint()).
 		Methods(http.MethodPost)
 
-	api.Handle("/room/users", handler.RoomUsersEndpoint()).
+	api.Handle("/room", handler.RoomStateEndpoint()).
 		Methods(http.MethodGet)
 
 	api.Handle("/room/next", handler.NextTurnEndpoint()).

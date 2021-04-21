@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { api } from '../axios'
 import { mapGetters, mapActions } from 'vuex'
 import Deck from './../components/Deck'
 import ScoreBoard from './../components/ScoreBoard'
@@ -49,7 +49,7 @@ export default {
         ]),
         sendVote: async function(ev) {
             try {
-                let result = await axios.post('http://localhost:8080/api/v1/vote', {
+                let result = await api.post('/vote', {
                     room_id: this.roomId,
                     user_id: this.userId,
                     vote: ev.card.vote
@@ -62,20 +62,22 @@ export default {
         },
         getRoomState: async function() {
             try {
-                let result = await axios.get('http://localhost:8080/api/v1/room/users?room_id=' + this.roomId)
+                let result = await api.get('/room?room_id=' + this.roomId)
 
                 if (result.status !== 200) {
                     throw Error('Response status is not 200')
                 }
-
-                this.users = result.data.users
+                
+                this.users = result.data.state.user_state
+                this.turn = result.data.state.current_turn
             } catch(err) {
+                this.users = []
                 console.error(err)
             }
         },
         nextTurn: async function() {
             try {
-                let result = await axios.post('http://localhost:8080/api/v1/room/next', {
+                let result = await api.post('/room/next', {
                     room_id: this.roomId
                 })
 
@@ -97,7 +99,6 @@ export default {
             }
 
             this.socket.onmessage = async (event)=> {
-                console.log('SOCKET EVENT', event)
                 await this.getRoomState()
             }
         }

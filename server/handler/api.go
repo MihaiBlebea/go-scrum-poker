@@ -22,7 +22,7 @@ type Poker interface {
 	CreateRoom() (string, error)
 	AddUser(roomID, username string) (string, error)
 	GetVoteOptions() []uint
-	TurnVotes(roomID string) ([]poker.UserVote, error)
+	GetState(roomID string) (*poker.State, error)
 	Vote(roomID, userID string, points uint) error
 	NextTurn(roomID string) (uint, error)
 }
@@ -48,8 +48,8 @@ func (s *Service) VoteOptionsEndpoint() http.Handler {
 	return voteOptionsEndpoint(s.poker, s.logger)
 }
 
-func (s *Service) RoomUsersEndpoint() http.Handler {
-	return roomUsersEndpoint(s.poker, s.logger)
+func (s *Service) RoomStateEndpoint() http.Handler {
+	return roomStateEndpoint(s.poker, s.logger)
 }
 
 func (s *Service) VoteEndpoint() http.Handler {
