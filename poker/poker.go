@@ -76,16 +76,25 @@ func (p *poker) Vote(roomID, userID string, points uint) error {
 		return errors.New("Vote is not a valid fibonacci number")
 	}
 
-	rm, err := p.roomRepo.GetByID(roomID)
+	room, err := p.roomRepo.GetByID(roomID)
 	if err != nil {
 		return err
 	}
 
-	vt, err := vote.New(userID, roomID, rm.Turn, points)
+	v, err := p.voteRepo.GetLatestVoteForUserInRoom(user.ID, room.ID)
+	if err != nil && err.Error() != "record not found" {
+		return err
+	}
+
+	if v.Vote == points {
+		return errors.New("Cannot point twice with the same number of points")
+	}
+
+	vote, err := vote.New(userID, roomID, room.Turn, points)
 	if err != nil {
 		return err
 	}
-	p.voteRepo.Save(vt)
+	p.voteRepo.Save(vote)
 
 	return nil
 }
