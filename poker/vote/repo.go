@@ -23,7 +23,18 @@ func (r *Repo) GetByID(ID string) (*Vote, error) {
 
 func (r *Repo) GetLatestByTurnAndRoomID(turn uint, roomID string) ([]Vote, error) {
 	votes := make([]Vote, 0)
-	err := r.db.Where("room_id = ? AND turn = ?", roomID, turn).Group("user_id").Find(&votes).Error
+	query := `
+		SELECT id, a.user_id, room_id, vote, turn, created_at, updated_at FROM (
+			SELECT user_id, MAX(created_at) as max_created
+			FROM votes
+			WHERE room_id = ? AND turn = ?
+			GROUP BY user_id
+		) AS a
+		INNER JOIN votes as b ON b.user_id = a.user_id AND b.created_at = a.max_created`
+
+	err := r.db.Raw(query, roomID, turn).
+		Scan(&votes).
+		Error
 
 	return votes, err
 }

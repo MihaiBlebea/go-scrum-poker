@@ -2,7 +2,6 @@ package poker
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/MihaiBlebea/go-scrum-poker/poker/room"
 	"github.com/MihaiBlebea/go-scrum-poker/poker/user"
@@ -22,10 +21,19 @@ type Poker interface {
 type poker struct {
 	voteOptions []uint
 	conn        *gorm.DB
+	voteRepo    *vote.Repo
+	roomRepo    *room.Repo
+	userRepo    *user.Repo
 }
 
 func New(db *gorm.DB) Poker {
-	return &poker{fibonacci(6), db}
+	return &poker{
+		voteOptions: fibonacci(6),
+		conn:        db,
+		voteRepo:    vote.NewRepo(db),
+		roomRepo:    room.NewRepo(db),
+		userRepo:    user.NewRepo(db),
+	}
 }
 
 func (p *poker) CreateRoom() (string, error) {
@@ -33,9 +41,7 @@ func (p *poker) CreateRoom() (string, error) {
 	if err != nil {
 		return "", err
 	}
-
-	repo := room.NewRepo(p.conn)
-	repo.Save(rm)
+	p.roomRepo.Save(rm)
 
 	return rm.ID, nil
 }
@@ -45,16 +51,13 @@ func (p *poker) AddUser(roomID, username string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
-	repo := user.NewRepo(p.conn)
-	repo.Save(usr)
+	p.userRepo.Save(usr)
 
 	return usr.ID, nil
 }
 
 func (p *poker) Vote(roomID, userID string, points uint) error {
-	repo := user.NewRepo(p.conn)
-	user, err := repo.GetByID(userID)
+	user, err := p.userRepo.GetByID(userID)
 	if err != nil {
 		return err
 	}
@@ -73,8 +76,7 @@ func (p *poker) Vote(roomID, userID string, points uint) error {
 		return errors.New("Vote is not a valid fibonacci number")
 	}
 
-	roomRepo := room.NewRepo(p.conn)
-	rm, err := roomRepo.GetByID(roomID)
+	rm, err := p.roomRepo.GetByID(roomID)
 	if err != nil {
 		return err
 	}
@@ -83,24 +85,21 @@ func (p *poker) Vote(roomID, userID string, points uint) error {
 	if err != nil {
 		return err
 	}
-
-	voteRepo := vote.NewRepo(p.conn)
-	voteRepo.Save(vt)
+	p.voteRepo.Save(vt)
 
 	return nil
 }
 
 func (p *poker) NextTurn(roomID string) (uint, error) {
-	repo := room.NewRepo(p.conn)
-	rm, err := repo.GetByID(roomID)
+	room, err := p.roomRepo.GetByID(roomID)
 	if err != nil {
 		return 0, err
 	}
 
-	rm.IncrementTurn()
-	repo.UpdateTurn(rm)
+	room.IncrementTurn()
+	p.roomRepo.UpdateTurn(room)
 
-	return rm.Turn, nil
+	return room.Turn, nil
 }
 
 func (p *poker) GetVoteOptions() []uint {
@@ -108,27 +107,22 @@ func (p *poker) GetVoteOptions() []uint {
 }
 
 func (p *poker) GetState(roomID string) (*State, error) {
-	userRepo := user.NewRepo(p.conn)
-	voteRepo := vote.NewRepo(p.conn)
-	roomRepo := room.NewRepo(p.conn)
-
-	room, err := roomRepo.GetByID(roomID)
+	room, err := p.roomRepo.GetByID(roomID)
 	if err != nil {
 		return &State{}, err
 	}
 
-	users, err := userRepo.GetByRoomID(roomID)
+	users, err := p.userRepo.GetByRoomID(roomID)
 	if err != nil {
 		return &State{}, err
 	}
 
-	votes, err := voteRepo.GetLatestByTurnAndRoomID(room.Turn, room.ID)
+	votes, err := p.voteRepo.GetLatestByTurnAndRoomID(room.Turn, room.ID)
 	if err != nil {
 		return &State{}, err
 	}
-	fmt.Println(room.ID, room.Turn)
 	state := newState(room.ID, room.Turn)
-	fmt.Println(votes)
+
 	for _, vote := range votes {
 		for _, user := range users {
 			if user.ID == vote.UserID {

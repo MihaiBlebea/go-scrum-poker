@@ -8,6 +8,9 @@ build-server:
 build-webapp:
 	cd ./webapp && npm run build
 
+watch-webapp:
+	cd ./webapp && npm run dev
+
 build:
 	docker-compose build
 

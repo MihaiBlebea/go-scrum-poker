@@ -4,27 +4,43 @@
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">{{ formTitle }}</h5>
-                        
+
+                        <h5 class="card-title">Create Room</h5>
+                        <div class="mb-3">
+                            <label class="form-label">Room name</label>
+                            <input type="text" class="form-control" v-model="roomName">
+                        </div>
+
+                        <div class="d-flex justify-content-center">
+                            <button class="btn btn-primary" v-on:click="submit">Create room</button>
+                        </div>
+                    
+                        <h5 class="card-title">{{ rightTitle }}</h5>
+
                         <div class="form-check form-switch">
                             <input class="form-check-input clickable" type="checkbox" v-model="mode">
                             <label class="form-check-label">Mode</label>
                         </div>
-                        
-                        <div class="mb-3" v-if="mode">
-                            <label class="form-label">Create room</label>
-                            <input type="text" class="form-control" v-model="roomName">
-                        </div>
-                        <div class="mb-3" v-else>
-                            <label class="form-label">Join room</label>
-                            <input type="text" class="form-control" v-model="roomId">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Username</label>
-                            <input type="text" class="form-control" v-model="username">
+
+                        <div class="py-5">
+                            <div v-if="mode">
+                                <div class="input-group mb-3">
+                                    <input type="text" class="form-control" v-model="roomId">
+                                    <button class="btn btn-outline-secondary" type="button">Copy</button>
+                                </div>
+                            </div>
+                            <div v-else>
+                                <div class="mb-3">
+                                    <label class="form-label">Room id</label>
+                                    <input type="text" class="form-control" v-model="roomId">
+                                </div>
+
+                                <div class="d-flex justify-content-center">
+                                    <button class="btn btn-primary" v-on:click="submit">Join</button>
+                                </div>
+                            </div>
                         </div>
 
-                        <button class="btn btn-primary" v-on:click="submit">Create room</button>
                     </div>
                 </div>
             </div>
@@ -33,13 +49,12 @@
 </template>
 
 <script>
-import { api } from './../axios'
-import { mapActions } from 'vuex'
+import { api } from '../axios'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
     data() {
         return {
-            firebaseUi: null,
             mode: true,
             roomName: '',
             roomId: '',
@@ -47,9 +62,16 @@ export default {
         }
     },
     computed: {
+        ...mapGetters([
+            'loggedIn',
+            'user'
+        ]),
         formTitle: function() {
             return this.mode ? 'Create room' : 'Join room'
         },
+        rightTitle: function() {
+            return this.mode ? 'Share room' : 'Join room'
+        }
     },
     methods: {
         ...mapActions([
@@ -71,7 +93,7 @@ export default {
         joinRoom: async function() {
             let result = await api.post('/room/user', {
                 room_id: this.roomId,
-                username: this.username
+                username: this.user.displayName
             })
 
             if (result.status !== 200) {
@@ -85,6 +107,7 @@ export default {
                 // This will create room
                 if (this.mode === true) {
                     this.roomId = await this.createRoom()
+                    return
                 }
 
                 let userId = await this.joinRoom()
@@ -98,7 +121,9 @@ export default {
         }
     },
     mounted: function() {
-        
+        if (! this.loggedIn) {
+            this.$router.replace({ name: 'Login' })
+        }
     }
 }
 </script>
@@ -106,5 +131,9 @@ export default {
 <style scoped>
 .clickable {
     cursor: pointer;
+}
+
+.border-right {
+    border-right: solid 1px rgba(0, 0, 0, 0.125);
 }
 </style>

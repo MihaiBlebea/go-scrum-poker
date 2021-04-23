@@ -9,10 +9,17 @@
                 <p>Turn: {{ turn }}</p>
 
                 <ScoreBoard :users="users" />
-                <Deck v-on:vote="sendVote" />
+                <Deck :can-vote="!progress"  v-on:vote="sendVote" />
 
             </div>
         </div>
+
+        <ProgressBar 
+            :show="progress" 
+            :duration="1000" 
+            v-on:completed="handleProgressCompleted"
+        />
+
         <div class="row justify-content-center mt-5">
             <button class="btn btn-primary col-md-3" v-on:click="nextTurn">Next turn</button>
         </div>
@@ -24,14 +31,16 @@ import { api } from '../axios'
 import { mapGetters, mapActions } from 'vuex'
 import Deck from './../components/Deck'
 import ScoreBoard from './../components/ScoreBoard'
+import ProgressBar from './../components/ProgressBar'
 
 export default {
-    components: { Deck, ScoreBoard },
+    components: { Deck, ScoreBoard, ProgressBar },
     data() {
         return {
             socket: null,
             users: [],
-            turn: 1
+            turn: 1,
+            progress: false
         }
     },
     computed: {
@@ -47,7 +56,12 @@ export default {
             'checkUserId',
             'clearUserId'
         ]),
+        handleProgressCompleted: function(ev) {
+            console.log("Vote completed")
+            this.progress = false
+        },
         sendVote: async function(ev) {
+            this.progress = true
             try {
                 let result = await api.post('/vote', {
                     room_id: this.roomId,

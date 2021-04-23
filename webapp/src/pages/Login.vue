@@ -5,7 +5,7 @@
                 <div class="card">
                     <div class="card-header">Login</div>
                     <div class="card-body">
-                        <div v-if="error" class="alert alert-danger">{{error}}</div>
+                        <div v-if="error" class="alert alert-danger">{{ error }}</div>
                         <form action="#" @submit.prevent="submit">
                             <div class="form-group row mb-3">
                                 <label for="email" class="col-md-4 col-form-label text-md-right">Email</label>
@@ -72,7 +72,7 @@ export default {
                 .signInWithEmailAndPassword(this.form.email, this.form.password)
                 .then(data => {
                     console.log(data)
-                    this.$router.replace({ name: 'Auth' })
+                    this.$router.replace({ name: 'Lobby' })
                 })
                 .catch(err => {
                     this.error = err.message;

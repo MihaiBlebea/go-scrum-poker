@@ -22,6 +22,13 @@ import Card from './Card'
 export default {
     name: 'Deck',
     components: { Card },
+    props: {
+        canVote: {
+            type: Boolean,
+            required: false,
+            default: true
+        }
+    },
     data() {
         return {
             deck: [],
@@ -85,7 +92,10 @@ export default {
             }
         },
         voteHandler: function(card) {
-            console.log('voted')
+            if (this.canVote === false) {
+                console.log('Vote is locked for the moment')
+                return
+            }
             this.$emit('vote', { card })
         }
     },

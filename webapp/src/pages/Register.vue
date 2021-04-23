@@ -92,12 +92,12 @@ export default {
                 .auth()
                 .createUserWithEmailAndPassword(this.form.email, this.form.password)
                 .then(data => {
-                    console.log(data)
-                    // this.$router.replace({ name: 'Auth' })
                     data.user.updateProfile({
                         displayName: this.form.name
                     })
-                    .then(() => {})
+                    .then(() => {
+                        this.$router.replace({ name: 'Auth' })
+                    })
                 })
                 .catch(err => {
                     this.error = err.message;
