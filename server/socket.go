@@ -38,80 +38,36 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(errors.New("Room id is missing"))
 	}
 
-	fmt.Println("IS CONNECTING")
-
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// _, b, err := ws.ReadMessage()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// request := ConnRequest{}
-	// err = json.Unmarshal(b, &request)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// fmt.Println(request)
-
-	// register client
-	// clients[roomID] = append(clients[roomID], ws)
 	if _, ok := clients[roomID]; ok == false {
 		fmt.Println("Set initial connection")
 		clients[roomID] = make(map[*websocket.Conn]bool)
 	}
 
 	clients[roomID][ws] = true
-	fmt.Println("CLIENTS on CONN", clients)
-	// for client := range clients {
-	// 	err := client.WriteMessage(websocket.TextMessage, []byte("helloooo back"))
-	// 	if err != nil {
-	// 		log.Printf("Websocket error: %s", err)
-	// 		client.Close()
-	// 		delete(clients, client)
-	// 	}
-	// }
-	// writer(Message{roomID: roomID, userID: "1234", message: "Hellooooo"})
-
-	// for client := range clients[roomID] {
-	// 	err := client.WriteMessage(websocket.TextMessage, []byte("Heeeey"))
-	// 	if err != nil {
-	// 		log.Printf("Websocket error: %s", err)
-	// 		client.Close()
-	// 		// clients[message.roomID] = remove(clients[message.roomID], index)
-	// 		delete(clients[roomID], client)
-	// 	}
-	// }
 }
 
 func writer(payload Message) {
-	fmt.Println("Send message")
 	Broadcast <- payload
 }
 
 func echo() {
 	for {
 		message := <-Broadcast
-		fmt.Println("Received message to send", message)
-
-		fmt.Println("CLIENTS", clients)
 
 		if _, ok := clients[message.RoomID]; ok == false {
 			log.Fatal(errors.New("Room id not found in clients"))
 		}
-
-		// latlong := fmt.Sprintf("%f %f %s", val.Lat, val.Long)
 
 		for client := range clients[message.RoomID] {
 			err := client.WriteMessage(websocket.TextMessage, []byte("Heeeey"))
 			if err != nil {
 				log.Printf("Websocket error: %s", err)
 				client.Close()
-				// clients[message.roomID] = remove(clients[message.roomID], index)
 				delete(clients[message.RoomID], client)
 			}
 		}

@@ -81,7 +81,7 @@ func (p *poker) Vote(roomID, userID string, points uint) error {
 		return err
 	}
 
-	v, err := p.voteRepo.GetLatestVoteForUserInRoom(user.ID, room.ID)
+	v, err := p.voteRepo.GetLatestVoteForUserInRoom(user.ID, room.ID, room.Turn)
 	if err != nil && err.Error() != "record not found" {
 		return err
 	}
@@ -116,6 +116,10 @@ func (p *poker) GetVoteOptions() []uint {
 }
 
 func (p *poker) GetState(roomID string) (*State, error) {
+	if roomID == "" {
+		return &State{}, errors.New("RoomID is an empty string")
+	}
+
 	room, err := p.roomRepo.GetByID(roomID)
 	if err != nil {
 		return &State{}, err
@@ -132,12 +136,13 @@ func (p *poker) GetState(roomID string) (*State, error) {
 	}
 	state := newState(room.ID, room.Turn)
 
-	for _, vote := range votes {
-		for _, user := range users {
-			if user.ID == vote.UserID {
-				state.addUserState(user.Username, vote.Vote)
-			}
+	for _, user := range users {
+		vote, found := matchUserVote(votes, &user)
+		if found == false {
+			state.addUserState(user.Username, 0)
+			continue
 		}
+		state.addUserState(user.Username, vote.Vote)
 	}
 
 	return state, nil

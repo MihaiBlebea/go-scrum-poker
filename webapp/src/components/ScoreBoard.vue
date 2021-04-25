@@ -5,8 +5,7 @@
             <div class="col-md-3" v-for="(user, index) in sortedUsers" :key="index">
                 <div class="card mb-3">
                     <div class="card-body px-2 py-0 d-flex justify-content-start align-items-center">
-                        <Vote :vote="user.vote" />
-                        <strong class="ms-3">{{ user.username }}</strong>
+                        <Vote :vote="user.vote" :reveal="reveal" :username="user.username" />
                     </div>
                 </div>
             </div>
@@ -19,9 +18,13 @@ import Vote from './Vote'
 
 export default {
     name: 'ScoreBoard',
-    components: {Vote},
-    // props: ['users'],
+    components: { Vote },
     props: {
+        reveal: {
+            type: Boolean,
+            required: false,
+            default: false
+        },
         users: {
             type: Array
         }

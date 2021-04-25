@@ -8,7 +8,7 @@
                 <p>User id: {{ userId }}</p>
                 <p>Turn: {{ turn }}</p>
 
-                <ScoreBoard :users="users" />
+                <ScoreBoard :users="users" :reveal="reveal" />
                 <Deck :can-vote="!progress"  v-on:vote="sendVote" />
 
             </div>
@@ -40,7 +40,8 @@ export default {
             socket: null,
             users: [],
             turn: 1,
-            progress: false
+            progress: false,
+            reveal: false
         }
     },
     computed: {
@@ -81,9 +82,10 @@ export default {
                 if (result.status !== 200) {
                     throw Error('Response status is not 200')
                 }
-                
-                this.users = result.data.state.user_state
-                this.turn = result.data.state.current_turn
+                let state = result.data.state
+                this.users  = state.user_state
+                this.turn   = state.current_turn
+                this.reveal = state.reveal
             } catch(err) {
                 this.users = []
                 console.error(err)

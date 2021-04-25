@@ -1,5 +1,10 @@
 package poker
 
+import (
+	"github.com/MihaiBlebea/go-scrum-poker/poker/user"
+	"github.com/MihaiBlebea/go-scrum-poker/poker/vote"
+)
+
 func fibonacci(n int) []uint {
 	a := 1
 	b := 1
@@ -13,4 +18,14 @@ func fibonacci(n int) []uint {
 	}
 
 	return list
+}
+
+func matchUserVote(votes []vote.Vote, u *user.User) (_ *vote.Vote, found bool) {
+	for _, v := range votes {
+		if v.UserID == u.ID {
+			return &v, true
+		}
+	}
+
+	return nil, false
 }

@@ -39,17 +39,15 @@ func (r *Repo) GetLatestByTurnAndRoomID(turn uint, roomID string) ([]Vote, error
 	return votes, err
 }
 
-func (r *Repo) GetLatestVoteForUserInRoom(userID, roomID string) (*Vote, error) {
+func (r *Repo) GetLatestVoteForUserInRoom(userID, roomID string, turn uint) (*Vote, error) {
 	vote := Vote{}
-	// err := r.db.Where("user_id = ? AND room_id = ?", userID, roomID).Last(&vote).Error
-
 	query := `
 		SELECT * FROM votes
-			WHERE user_id = ? AND room_id = ?
+			WHERE user_id = ? AND room_id = ? AND turn = ?
 			ORDER BY created_at DESC
 			LIMIT 1`
 
-	err := r.db.Raw(query, userID, roomID).
+	err := r.db.Raw(query, userID, roomID, turn).
 		Scan(&vote).
 		Error
 
