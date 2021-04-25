@@ -3,6 +3,11 @@ FROM golang:1.16.2-buster AS build_base
 
 RUN apt-get install git
 
+RUN apt install curl &&\
+    curl -sL https://deb.nodesource.com/setup_6.x | bash - &&\
+    apt-get install -y nodejs &&\
+    apt-get install -y npm
+
 WORKDIR /tmp/app
 
 COPY go.mod .
