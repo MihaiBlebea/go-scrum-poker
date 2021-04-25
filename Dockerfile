@@ -17,7 +17,7 @@ RUN go mod download
 
 COPY . .
 
-RUN cd ./webapp && npm run build
+RUN cd ./webapp && npm install && npm run build
 
 # Unit tests
 RUN CGO_ENABLED=0 go test -v
