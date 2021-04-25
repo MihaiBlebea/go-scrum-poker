@@ -3,11 +3,6 @@ FROM golang:1.16.2-buster AS build_base
 
 RUN apt-get install git
 
-RUN apt install curl &&\
-    curl -sL https://deb.nodesource.com/setup_6.x | bash - &&\
-    apt-get install -y nodejs &&\
-    apt-get install -y npm
-
 WORKDIR /tmp/app
 
 COPY go.mod .
@@ -16,8 +11,6 @@ COPY go.sum .
 RUN go mod download
 
 COPY . .
-
-RUN cd ./webapp && npm install && npm run build
 
 # Unit tests
 RUN CGO_ENABLED=0 go test -v
