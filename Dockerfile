@@ -34,9 +34,9 @@ RUN update-ca-certificates
 
 WORKDIR /app
 
-USER nobody
+# USER nobody
 
-COPY --from=build_base --chown=nobody /tmp/app/out/scrum-poker /app/scrum-poker
+COPY --from=build_base /tmp/app/out/scrum-poker /app/scrum-poker
 
 EXPOSE ${HTTP_PORT}
 
