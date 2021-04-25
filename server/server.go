@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"io/fs"
 	"log"
 
 	"net/http"
@@ -42,9 +43,20 @@ func server(handler Handler, logger Logger) {
 		Methods(http.MethodGet)
 
 	// Handle static files
-	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./webapp/dist/static"))))
+	webapp, err := fs.Sub(static, "webapp")
+	if err != nil {
+		fmt.Println(err)
+	}
 
-	r.Handle("/", singlePageApp()).Methods(http.MethodGet)
+	static, err := fs.Sub(webapp, "static")
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	r.PathPrefix("/static/css/").Handler(http.StripPrefix("/static/", http.FileServer(http.FS(static))))
+	r.PathPrefix("/static/js/").Handler(http.StripPrefix("/static/", http.FileServer(http.FS(static))))
+
+	r.Handle("/", http.FileServer(http.FS(webapp)))
 
 	// Handle websocket
 	r.HandleFunc("/ws/{room_id}", wsHandler)
@@ -62,14 +74,4 @@ func server(handler Handler, logger Logger) {
 	logger.Info(fmt.Sprintf("Started server on port %s", os.Getenv("HTTP_PORT")))
 
 	log.Fatal(srv.ListenAndServe())
-}
-
-func singlePageApp() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		w.Header().Set("X-Content-Type-Options", "nosniff")
-		w.WriteHeader(200)
-
-		http.ServeFile(w, r, "./webapp/dist/index.html")
-	})
 }

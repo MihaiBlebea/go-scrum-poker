@@ -6,7 +6,7 @@ build-server:
 	go build -o=./scrum-poker . && ./scrum-poker start
 
 build-webapp:
-	cd ./webapp && npm run build
+	cd ./webapp && npm run build && cp -r ./dist/* ./../server/webapp/
 
 watch-webapp:
 	cd ./webapp && npm run dev
