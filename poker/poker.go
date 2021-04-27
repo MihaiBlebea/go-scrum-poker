@@ -3,6 +3,7 @@ package poker
 import (
 	"errors"
 
+	"github.com/MihaiBlebea/go-scrum-poker/jwt"
 	"github.com/MihaiBlebea/go-scrum-poker/poker/room"
 	"github.com/MihaiBlebea/go-scrum-poker/poker/user"
 	"github.com/MihaiBlebea/go-scrum-poker/poker/vote"
@@ -48,6 +49,10 @@ func (p *poker) CreateRoom(name string) (string, error) {
 }
 
 func (p *poker) CreateUser(username, email, token string) (string, error) {
+	if _, ok := jwt.VerifyJWT(token, "scrumpoker-auth"); ok == false {
+		return "", errors.New("Invalid auth token")
+	}
+
 	user, err := user.New(username, email, token)
 	if err != nil {
 		return "", err
