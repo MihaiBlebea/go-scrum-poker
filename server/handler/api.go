@@ -19,8 +19,9 @@ type Logger interface {
 }
 
 type Poker interface {
-	CreateRoom() (string, error)
-	AddUser(roomID, username string) (string, error)
+	CreateRoom(name string) (string, error)
+	CreateUser(username, email, token string) (string, error)
+	AddUser(roomID, username, token string) (string, error)
 	GetVoteOptions() []uint
 	GetState(roomID string) (*poker.State, error)
 	Vote(roomID, userID string, points uint) error
@@ -42,6 +43,10 @@ func (s *Service) JoinRoomEndpoint() http.Handler {
 
 func (s *Service) CreateRoomEndpoint() http.Handler {
 	return createRoomEndpoint(s.poker, s.logger)
+}
+
+func (s *Service) CreateUserEndpoint() http.Handler {
+	return createUserEndpoint(s.poker, s.logger)
 }
 
 func (s *Service) VoteOptionsEndpoint() http.Handler {

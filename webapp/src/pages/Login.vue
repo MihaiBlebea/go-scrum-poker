@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import firebase from "firebase"
+import { mapActions } from 'vuex'
 
 export default {
     data: function() {
@@ -66,17 +66,23 @@ export default {
         }
     },
     methods: {
-        submit: function() {
-            firebase
-                .auth()
-                .signInWithEmailAndPassword(this.form.email, this.form.password)
-                .then(data => {
-                    console.log(data)
-                    this.$router.replace({ name: 'Lobby' })
+        ...mapActions([
+            'login'
+        ]),
+        submit: async function() {
+            try {
+                let result = await this.login({ 
+                    email: this.form.email, 
+                    password: this.form.password 
                 })
-                .catch(err => {
-                    this.error = err.message;
-                })
+                
+                console.log(result)
+                this.$router.replace({ name: 'Lobby' })
+                
+            } catch(err) {
+                console.error(err)
+                this.error = err.message
+            }
         }
     }
 }

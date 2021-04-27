@@ -10,20 +10,22 @@ type User struct {
 	ID        string    `gorm:"primaryKey" json:"id"`
 	RoomID    string    `json:"room_id"`
 	Username  string    `json:"username"`
+	Email     string    `json:"email"`
+	Token     string    `json:"token"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-func New(roomId, username string) (*User, error) {
-	user := User{}
-
+func New(username, email, token string) (*User, error) {
 	id, err := uuid.NewV4()
 	if err != nil {
-		return &user, err
+		return &User{}, err
 	}
-	user.ID = id.String()
-	user.Username = username
-	user.RoomID = roomId
 
-	return &user, nil
+	return &User{
+		ID:       id.String(),
+		Username: username,
+		Email:    email,
+		Token:    token,
+	}, nil
 }

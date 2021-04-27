@@ -93,7 +93,8 @@ export default {
         joinRoom: async function() {
             let result = await api.post('/room/user', {
                 room_id: this.roomId,
-                username: this.user.displayName
+                username: this.user.displayName,
+                token: this.user
             })
 
             if (result.status !== 200) {

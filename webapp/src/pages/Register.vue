@@ -72,7 +72,7 @@
 
 
 <script>
-import firebase from "firebase"
+import { mapActions } from 'vuex'
 
 export default {
     name: 'Register',
@@ -87,21 +87,21 @@ export default {
         }
     },
     methods: {
-        submit: function() {
-            firebase
-                .auth()
-                .createUserWithEmailAndPassword(this.form.email, this.form.password)
-                .then(data => {
-                    data.user.updateProfile({
-                        displayName: this.form.name
-                    })
-                    .then(() => {
-                        this.$router.replace({ name: 'Auth' })
-                    })
+        ...mapActions([
+            'register'
+        ]),
+        submit: async function() {
+            try {
+                await this.register({ 
+                    username: this.form.name, 
+                    email: this.form.email, 
+                    password: this.form.password 
                 })
-                .catch(err => {
-                    this.error = err.message;
-                })
+
+                this.$router.replace({ name: 'Auth' })
+            } catch(err) {
+                this.error = err.message
+            }
         }
     }
 }

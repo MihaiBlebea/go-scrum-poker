@@ -10,8 +10,9 @@ import (
 )
 
 type Poker interface {
-	CreateRoom() (string, error)
-	AddUser(roomID, username string) (string, error)
+	CreateRoom(name string) (string, error)
+	CreateUser(username, email, token string) (string, error)
+	AddUser(roomID, username, token string) (string, error)
 	Vote(roomID, userID string, points uint) error
 	NextTurn(roomID string) (uint, error)
 	GetVoteOptions() []uint
@@ -36,8 +37,8 @@ func New(db *gorm.DB) Poker {
 	}
 }
 
-func (p *poker) CreateRoom() (string, error) {
-	rm, err := room.New()
+func (p *poker) CreateRoom(name string) (string, error) {
+	rm, err := room.New(name)
 	if err != nil {
 		return "", err
 	}
@@ -46,8 +47,18 @@ func (p *poker) CreateRoom() (string, error) {
 	return rm.ID, nil
 }
 
-func (p *poker) AddUser(roomID, username string) (string, error) {
-	usr, err := user.New(roomID, username)
+func (p *poker) CreateUser(username, email, token string) (string, error) {
+	user, err := user.New(username, email, token)
+	if err != nil {
+		return "", err
+	}
+	p.userRepo.Save(user)
+
+	return user.ID, nil
+}
+
+func (p *poker) AddUser(roomID, username, token string) (string, error) {
+	usr, err := user.New(username, "", token)
 	if err != nil {
 		return "", err
 	}

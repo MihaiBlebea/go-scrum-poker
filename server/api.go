@@ -18,6 +18,7 @@ type Handler interface {
 	HealthEndpoint() http.Handler
 	JoinRoomEndpoint() http.Handler
 	CreateRoomEndpoint() http.Handler
+	CreateUserEndpoint() http.Handler
 	VoteOptionsEndpoint() http.Handler
 	RoomStateEndpoint() http.Handler
 	VoteEndpoint() http.Handler

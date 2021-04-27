@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"encoding/json"
+	"errors"
 	"net/http"
 )
 
@@ -15,11 +17,32 @@ type CreateRoomResponse struct {
 }
 
 func createRoomEndpoint(poker Poker, logger Logger) http.Handler {
+	validate := func(r *http.Request) (*CreateRoomRequest, error) {
+		request := CreateRoomRequest{}
+
+		err := json.NewDecoder(r.Body).Decode(&request)
+		if err != nil {
+			return &request, err
+		}
+
+		if request.Name == "" {
+			return &request, errors.New("Invalid request param name")
+		}
+
+		return &request, nil
+	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		response := CreateRoomResponse{}
 
-		id, err := poker.CreateRoom()
+		request, err := validate(r)
+		if err != nil {
+			response.Message = err.Error()
+			sendResponse(w, response, http.StatusBadRequest, logger)
+			return
+		}
+
+		id, err := poker.CreateRoom(request.Name)
 		if err != nil {
 			response.Message = err.Error()
 			sendResponse(w, response, http.StatusBadRequest, logger)

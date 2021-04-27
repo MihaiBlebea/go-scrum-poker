@@ -3,7 +3,7 @@ module github.com/MihaiBlebea/go-scrum-poker
 go 1.16
 
 require (
-	github.com/armon/consul-api v0.0.0-20180202201655-eb2c6b5be1b6 // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/websocket v1.4.2

@@ -36,6 +36,9 @@ func server(handler Handler, logger Logger) {
 	api.Handle("/room/next", handler.NextTurnEndpoint()).
 		Methods(http.MethodPost)
 
+	api.Handle("/user", handler.CreateUserEndpoint()).
+		Methods(http.MethodPost)
+
 	api.Handle("/vote", handler.VoteEndpoint()).
 		Methods(http.MethodPost)
 

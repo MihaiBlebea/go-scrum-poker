@@ -8,13 +8,14 @@ import (
 
 type Room struct {
 	ID        string    `gorm:"primaryKey" json:"id"`
+	Name      string    `json:"name"`
 	Turn      uint      `json:"turn"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-func New() (*Room, error) {
-	room := Room{}
+func New(name string) (*Room, error) {
+	room := Room{Name: name}
 
 	id, err := uuid.NewV4()
 	if err != nil {

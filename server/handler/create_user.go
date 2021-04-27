@@ -6,33 +6,33 @@ import (
 	"net/http"
 )
 
-type JoinRoomRequest struct {
-	RoomID   string `json:"room_id"`
+type CreateUserRequest struct {
 	Username string `json:"username"`
+	Email    string `json:"email"`
 	Token    string `json:"token"`
 }
 
-type JoinRoomResponse struct {
+type CreateUserResponse struct {
 	ID      string `json:"id,omitempty"`
 	Success bool   `json:"success"`
 	Message string `json:"message,omitempty"`
 }
 
-func joinRoomEndpoint(poker Poker, logger Logger) http.Handler {
-	validate := func(r *http.Request) (*JoinRoomRequest, error) {
-		request := JoinRoomRequest{}
+func createUserEndpoint(poker Poker, logger Logger) http.Handler {
+	validate := func(r *http.Request) (*CreateUserRequest, error) {
+		request := CreateUserRequest{}
 
 		err := json.NewDecoder(r.Body).Decode(&request)
 		if err != nil {
 			return &request, err
 		}
 
-		if request.RoomID == "" || len(request.RoomID) < 3 {
-			return &request, errors.New("Invalid request param room_id")
-		}
-
 		if request.Username == "" || len(request.Username) < 3 {
 			return &request, errors.New("Invalid request param username")
+		}
+
+		if request.Email == "" || len(request.Email) < 3 {
+			return &request, errors.New("Invalid request param email")
 		}
 
 		if request.Token == "" || len(request.Token) < 3 {
@@ -43,7 +43,7 @@ func joinRoomEndpoint(poker Poker, logger Logger) http.Handler {
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		response := JoinRoomResponse{}
+		response := CreateRoomResponse{}
 
 		request, err := validate(r)
 		if err != nil {
@@ -52,7 +52,11 @@ func joinRoomEndpoint(poker Poker, logger Logger) http.Handler {
 			return
 		}
 
-		id, err := poker.AddUser(request.RoomID, request.Username, request.Token)
+		id, err := poker.CreateUser(
+			request.Username,
+			request.Email,
+			request.Token,
+		)
 		if err != nil {
 			response.Message = err.Error()
 			sendResponse(w, response, http.StatusBadRequest, logger)
