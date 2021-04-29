@@ -16,3 +16,9 @@ build:
 
 up:
 	docker-compose up -d
+
+refresh:
+	docker-compose stop &&\
+	docker-compose remove &&\
+	rm -r ./volume &&\
+	make local

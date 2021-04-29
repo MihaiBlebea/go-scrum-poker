@@ -39,13 +39,13 @@ func New(db *gorm.DB) Poker {
 }
 
 func (p *poker) CreateRoom(name string) (string, error) {
-	rm, err := room.New(name)
+	room, err := room.New(name)
 	if err != nil {
 		return "", err
 	}
-	p.roomRepo.Save(rm)
+	p.roomRepo.Save(room)
 
-	return rm.ID, nil
+	return room.JoinURL, nil
 }
 
 func (p *poker) CreateUser(username, email, token string) (string, error) {

@@ -15,6 +15,10 @@ content-type: application/json
 POST {{base_url}}/room HTTP/1.1
 content-type: application/json
 
+{
+    "name": "Nexus"
+}
+
 ###
 
 @room_id=20011fc0-e312-4cc3-9d68-22ea85b135b2

@@ -7,11 +7,11 @@ import (
 )
 
 type CreateRoomRequest struct {
-	Name string `json:"room_name"`
+	Name string `json:"name"`
 }
 
 type CreateRoomResponse struct {
-	ID      string `json:"id,omitempty"`
+	JoinURL string `json:"join_url,omitempty"`
 	Success bool   `json:"success"`
 	Message string `json:"message,omitempty"`
 }
@@ -42,14 +42,14 @@ func createRoomEndpoint(poker Poker, logger Logger) http.Handler {
 			return
 		}
 
-		id, err := poker.CreateRoom(request.Name)
+		joinUrl, err := poker.CreateRoom(request.Name)
 		if err != nil {
 			response.Message = err.Error()
 			sendResponse(w, response, http.StatusBadRequest, logger)
 			return
 		}
 
-		response.ID = id
+		response.JoinURL = joinUrl
 		response.Success = true
 
 		sendResponse(w, response, 200, logger)

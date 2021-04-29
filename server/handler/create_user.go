@@ -43,7 +43,7 @@ func createUserEndpoint(poker Poker, logger Logger) http.Handler {
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		response := CreateRoomResponse{}
+		response := CreateUserResponse{}
 
 		request, err := validate(r)
 		if err != nil {

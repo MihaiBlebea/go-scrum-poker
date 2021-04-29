@@ -80,14 +80,14 @@ export default {
         // Returns room id or throws error
         createRoom: async function() {
             let result = await api.post('/room', {
-                room_name: this.roomName
+                name: this.roomName
             })
 
             if (result.status !== 200) {
                 throw Error('Error during the api request')
             }
 
-            return result.data.id
+            return result.data.join_url
         },
         // Returns user id or throws error
         joinRoom: async function() {
