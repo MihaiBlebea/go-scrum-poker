@@ -26,3 +26,10 @@ func (r *Repo) GetByID(ID string) (*Room, error) {
 
 	return &room, err
 }
+
+func (r *Repo) GetByJoinCode(code string) (*Room, error) {
+	room := Room{}
+	err := r.db.Where("join_code = ?", code).Find(&room).Error
+
+	return &room, err
+}

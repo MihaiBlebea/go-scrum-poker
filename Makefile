@@ -19,6 +19,6 @@ up:
 
 refresh:
 	docker-compose stop &&\
-	docker-compose remove &&\
+	docker-compose rm &&\
 	rm -r ./volume &&\
 	make local

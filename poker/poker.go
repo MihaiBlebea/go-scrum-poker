@@ -10,10 +10,12 @@ import (
 	"gorm.io/gorm"
 )
 
+const projectID = "scrumpoker-auth"
+
 type Poker interface {
 	CreateRoom(name string) (string, error)
 	CreateUser(username, email, token string) (string, error)
-	AddUser(roomID, username, token string) (string, error)
+	JoinRoom(roomCode, token string) (string, error)
 	Vote(roomID, userID string, points uint) error
 	NextTurn(roomID string) (uint, error)
 	GetVoteOptions() []uint
@@ -45,11 +47,11 @@ func (p *poker) CreateRoom(name string) (string, error) {
 	}
 	p.roomRepo.Save(room)
 
-	return room.JoinURL, nil
+	return room.JoinCode, nil
 }
 
 func (p *poker) CreateUser(username, email, token string) (string, error) {
-	if _, ok := jwt.VerifyJWT(token, "scrumpoker-auth"); ok == false {
+	if _, ok := jwt.VerifyJWT(token, projectID); ok == false {
 		return "", errors.New("Invalid auth token")
 	}
 
@@ -62,14 +64,25 @@ func (p *poker) CreateUser(username, email, token string) (string, error) {
 	return user.ID, nil
 }
 
-func (p *poker) AddUser(roomID, username, token string) (string, error) {
-	usr, err := user.New(username, "", token)
+func (p *poker) JoinRoom(roomCode, token string) (string, error) {
+	if _, ok := jwt.VerifyJWT(token, projectID); ok == false {
+		return "", errors.New("Invalid auth token")
+	}
+
+	user, err := p.userRepo.GetByToken(token)
 	if err != nil {
 		return "", err
 	}
-	p.userRepo.Save(usr)
 
-	return usr.ID, nil
+	room, err := p.roomRepo.GetByJoinCode(roomCode)
+	if err != nil {
+		return "", err
+	}
+
+	user.RoomID = room.ID
+	p.userRepo.UpdateRoom(user)
+
+	return user.ID, nil
 }
 
 func (p *poker) Vote(roomID, userID string, points uint) error {

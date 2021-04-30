@@ -27,7 +27,7 @@ func server(handler Handler, logger Logger) {
 	api.Handle("/room", handler.CreateRoomEndpoint()).
 		Methods(http.MethodPost)
 
-	api.Handle("/room/user", handler.JoinRoomEndpoint()).
+	api.Handle("/room/{room_code}", handler.JoinRoomEndpoint()).
 		Methods(http.MethodPost)
 
 	api.Handle("/room", handler.RoomStateEndpoint()).
@@ -68,7 +68,7 @@ func server(handler Handler, logger Logger) {
 	r.Use(loggerMiddleware(logger))
 
 	srv := &http.Server{
-		Handler:      cors.Default().Handler(r),
+		Handler:      cors.AllowAll().Handler(r),
 		Addr:         fmt.Sprintf("0.0.0.0:%s", os.Getenv("HTTP_PORT")),
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,

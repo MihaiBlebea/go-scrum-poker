@@ -11,9 +11,9 @@ type CreateRoomRequest struct {
 }
 
 type CreateRoomResponse struct {
-	JoinURL string `json:"join_url,omitempty"`
-	Success bool   `json:"success"`
-	Message string `json:"message,omitempty"`
+	JoinCode string `json:"join_code,omitempty"`
+	Success  bool   `json:"success"`
+	Message  string `json:"message,omitempty"`
 }
 
 func createRoomEndpoint(poker Poker, logger Logger) http.Handler {
@@ -42,14 +42,14 @@ func createRoomEndpoint(poker Poker, logger Logger) http.Handler {
 			return
 		}
 
-		joinUrl, err := poker.CreateRoom(request.Name)
+		code, err := poker.CreateRoom(request.Name)
 		if err != nil {
 			response.Message = err.Error()
 			sendResponse(w, response, http.StatusBadRequest, logger)
 			return
 		}
 
-		response.JoinURL = joinUrl
+		response.JoinCode = code
 		response.Success = true
 
 		sendResponse(w, response, 200, logger)

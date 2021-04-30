@@ -21,7 +21,7 @@ type Logger interface {
 type Poker interface {
 	CreateRoom(name string) (string, error)
 	CreateUser(username, email, token string) (string, error)
-	AddUser(roomID, username, token string) (string, error)
+	JoinRoom(roomCode, token string) (string, error)
 	GetVoteOptions() []uint
 	GetState(roomID string) (*poker.State, error)
 	Vote(roomID, userID string, points uint) error

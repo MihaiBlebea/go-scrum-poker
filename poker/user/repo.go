@@ -21,9 +21,20 @@ func (r *Repo) GetByID(ID string) (*User, error) {
 	return &user, err
 }
 
+func (r *Repo) GetByToken(token string) (*User, error) {
+	user := User{}
+	err := r.db.Where("token = ?", token).Find(&user).Error
+
+	return &user, err
+}
+
 func (r *Repo) GetByRoomID(ID string) ([]User, error) {
 	users := make([]User, 0)
 	err := r.db.Where("room_id = ?", ID).Find(&users).Error
 
 	return users, err
+}
+
+func (r *Repo) UpdateRoom(user *User) {
+	r.db.Model(&User{}).Where("id = ?", user.ID).Update("room_id", user.RoomID)
 }

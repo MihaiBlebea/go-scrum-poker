@@ -8,17 +8,11 @@ Vue.use(Vuex)
 
 const store =  new Vuex.Store({
     state: {
-        userId: null,
         loggedIn: false,
-        user: null
+        user: null,
+        token: null
     },
     mutations: {
-        clearUserId(state) {
-            state.userId = null
-        },
-        setUserId(state, { userId }) {
-            state.userId = userId
-        },
         setLoggedIn(state, value) {
             switch (value) {
                 case true:
@@ -33,36 +27,30 @@ const store =  new Vuex.Store({
         },
         setUser(state, user) {
             state.user = user
+        },
+        setToken(state, token) {
+            state.token = token
         }
     },
     actions: {
-        fetchUser({ commit }, user) {
+        async handleAuthChange({ commit }, user) {
             commit('setLoggedIn', user !== null)
             if (user) {
                 commit('setUser', {
                     displayName: user.displayName,
-                    email: user.email
+                    email: user.qemail
                 })
+                let token = await firebase
+                    .auth()
+                    .currentUser
+                    .getIdToken(true)
+                    
+                commit('setToken', token)
             } else {
                 commit('setUser', null)
+                commit('setToken', null)
+                router.replace({ name: 'Home' })
             }
-        },
-        async checkUserId(context) {
-            if (! localStorage.getItem("userID")) {
-                context.commit('clearUserId')
-            } else {
-                let userId = localStorage.getItem("userID")
-                context.commit('setUserId', { userId })
-            }
-        },
-        setUserId({ _dispatch, commit }, { userId }) {
-            localStorage.setItem("userID", userId)
-            commit('setUserId', { userId })
-        },
-        clearUserId(context) {
-            localStorage.clear()
-            context.commit('clearUserId')
-            router.push('/')
         },
         register(context, { username, email, password }) {
             return new Promise((resolve, reject) => {
@@ -79,12 +67,12 @@ const store =  new Vuex.Store({
                             .currentUser
                             .getIdToken(true)
                     })
-                    .then(idToken => {
+                    .then(token => {
                         return api
                             .post('/user', { 
                                 username: username, 
                                 email: email, 
-                                token: idToken 
+                                token: token 
                             })
                         })
                     .then((result)=> {
@@ -95,7 +83,7 @@ const store =  new Vuex.Store({
                     })
             })
         },
-        login(context, { email, password }) {
+        login({ commit }, { email, password }) {
             return new Promise((resolve, reject) => {
                 firebase
                     .auth()
@@ -107,17 +95,22 @@ const store =  new Vuex.Store({
                         reject(err)
                     })
             })
-        }
+        },
+        async logout(_context) {
+            await firebase
+                .auth()
+                .signOut()
+        },
     },
     getters: {
-        userId(state) {
-            return state.userId
-        },
         user(state) {
             return state.user
         },
         loggedIn(state) {
             return state.user !== null
+        },
+        token(state) {
+            return state.token
         }
     }
 })

@@ -4,12 +4,13 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 type JoinRoomRequest struct {
-	RoomID   string `json:"room_id"`
-	Username string `json:"username"`
-	Token    string `json:"token"`
+	RoomCode string
+	Token    string
 }
 
 type JoinRoomResponse struct {
@@ -22,22 +23,28 @@ func joinRoomEndpoint(poker Poker, logger Logger) http.Handler {
 	validate := func(r *http.Request) (*JoinRoomRequest, error) {
 		request := JoinRoomRequest{}
 
-		err := json.NewDecoder(r.Body).Decode(&request)
+		token, err := extractBearerToken(r)
 		if err != nil {
 			return &request, err
 		}
 
-		if request.RoomID == "" || len(request.RoomID) < 3 {
-			return &request, errors.New("Invalid request param room_id")
+		params := mux.Vars(r)
+		roomCode, ok := params["room_code"]
+		if ok == false {
+			return &request, errors.New("Invalid request param room_code")
 		}
 
-		if request.Username == "" || len(request.Username) < 3 {
-			return &request, errors.New("Invalid request param username")
+		err = json.NewDecoder(r.Body).Decode(&request)
+		if err != nil {
+			return &request, err
 		}
 
-		if request.Token == "" || len(request.Token) < 3 {
-			return &request, errors.New("Invalid request param token")
+		if roomCode == "" || len(roomCode) < 6 {
+			return &request, errors.New("Invalid request param room_code")
 		}
+
+		request.RoomCode = roomCode
+		request.Token = token
 
 		return &request, nil
 	}
@@ -52,7 +59,7 @@ func joinRoomEndpoint(poker Poker, logger Logger) http.Handler {
 			return
 		}
 
-		id, err := poker.AddUser(request.RoomID, request.Username, request.Token)
+		id, err := poker.JoinRoom(request.RoomCode, request.Token)
 		if err != nil {
 			response.Message = err.Error()
 			sendResponse(w, response, http.StatusBadRequest, logger)

@@ -79,6 +79,7 @@ export default {
         ]),
         // Returns room id or throws error
         createRoom: async function() {
+            console.log('TOKeN', this.token)
             let result = await api.post('/room', {
                 name: this.roomName
             })
@@ -87,15 +88,11 @@ export default {
                 throw Error('Error during the api request')
             }
 
-            return result.data.join_url
+            return result.data.join_code
         },
         // Returns user id or throws error
         joinRoom: async function() {
-            let result = await api.post('/room/user', {
-                room_id: this.roomId,
-                username: this.user.displayName,
-                token: this.user
-            })
+            let result = await api.post('/room/' + this.roomId, {})
 
             if (result.status !== 200) {
                 throw Error('Error during the api request')

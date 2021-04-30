@@ -72,7 +72,7 @@
 
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
     name: 'Register',
@@ -85,6 +85,18 @@ export default {
             },
             error: null
         }
+    },
+    watch: {
+        loggedIn: function(value, _old) {
+            if (value) {
+                this.$router.replace({ name: 'Lobby' })
+            }
+        }
+    },
+    computed: {
+        ...mapGetters([
+            'loggedIn'
+        ])
     },
     methods: {
         ...mapActions([
@@ -102,6 +114,11 @@ export default {
             } catch(err) {
                 this.error = err.message
             }
+        }
+    },
+    mounted: function() {
+        if (this.loggedIn) {
+            this.$router.replace({ name: 'Lobby' })
         }
     }
 }

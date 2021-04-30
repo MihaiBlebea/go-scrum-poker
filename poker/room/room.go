@@ -11,7 +11,7 @@ type Room struct {
 	ID        string    `gorm:"primaryKey" json:"id"`
 	Name      string    `json:"name"`
 	Turn      uint      `json:"turn"`
-	JoinURL   string    `json:"join_url"`
+	JoinCode  string    `json:"join_code"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
@@ -23,10 +23,10 @@ func New(name string) (*Room, error) {
 	}
 
 	return &Room{
-		ID:      id.String(),
-		Name:    name,
-		Turn:    1,
-		JoinURL: generateJoinURL(6),
+		ID:       id.String(),
+		Name:     name,
+		Turn:     1,
+		JoinCode: generateJoinURL(6),
 	}, nil
 }
 

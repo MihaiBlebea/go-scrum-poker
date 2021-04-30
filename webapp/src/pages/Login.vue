@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
     data: function() {
@@ -64,6 +64,18 @@ export default {
             },
             error: null
         }
+    },
+    watch: {
+        loggedIn: function(value, _old) {
+            if (value) {
+                this.$router.replace({ name: 'Lobby' })
+            }
+        }
+    },
+    computed: {
+        ...mapGetters([
+            'loggedIn'
+        ])
     },
     methods: {
         ...mapActions([
@@ -83,6 +95,11 @@ export default {
                 console.error(err)
                 this.error = err.message
             }
+        }
+    },
+    created: function() {
+        if (this.loggedIn) {
+            this.$router.replace({ name: 'Lobby' })
         }
     }
 }

@@ -29,7 +29,7 @@
 
 <script>
 import firebase from 'firebase'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
     data: function() {
@@ -46,15 +46,15 @@ export default {
         }
     },
     methods: {
-        logout: function() {
-            firebase
-                .auth()
-                .signOut()
-                .then(() => {
-                    this.$router.replace({
-                        name: "Login"
-                    })
-                })
+        ...mapActions([
+            'logout'
+        ]),
+        handleLogout: function() {
+            this.logout().then(() => {
+                this.$router.replace({ name: 'Login' })
+            }).catch((err) => {
+                console.error(err)
+            })
         }
     }
 }
